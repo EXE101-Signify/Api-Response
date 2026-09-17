@@ -1,6 +1,8 @@
 plugins {
     `java-library`
     `maven-publish`
+    id("com.vanniktech.maven.publish") version "0.37.0"
+
 }
 
 group = "fptu.exe202.signify"
@@ -56,6 +58,36 @@ publishing {
                 name.set("api-response")
                 description.set(project.description)
             }
+        }
+    }
+}
+
+mavenPublishing {
+    coordinates("fptu.exe202.signify.apiresponse", "api-response", "1.0.0")
+
+    pom {
+        name.set("Common Api Response")
+        description.set("Standardized API responses and validation error handling for Spring Boot.")
+        inceptionYear.set("2026")
+        url.set("https://github.com/EXE101-Signify/Api-Response")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+        developers {
+            developer {
+                id.set("GWuy")
+                name.set("Bùi Gia Huy")
+                url.set("https://github.com/GWuy")
+            }
+        }
+        scm {
+            url.set("https://github.com/EXE101-Signify/Api-Response")
+            connection.set("scm:git:git://github.com/EXE101-Signify/Api-Response.git")
+            developerConnection.set("scm:git:ssh://git@github.com/EXE101-Signify/Api-Response.git")
         }
     }
 }

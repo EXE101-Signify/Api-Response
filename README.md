@@ -1,8 +1,9 @@
 # api-response
 
+[![Maven Central](https://img.shields.io/maven-central/v/fptu.exe202.signify/api-response)](https://central.sonatype.com/artifact/fptu.exe202.signify/api-response)
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green)](https://spring.io/projects/spring-boot)
-[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
 
 Thư viện Java cung cấp **chuẩn hoá API response** và **xử lý exception tự động** cho các project Spring Boot.
 
@@ -16,7 +17,6 @@ Chỉ cần thêm dependency — không cần cấu hình thủ công.
 
 ```kotlin
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
@@ -29,7 +29,6 @@ dependencies {
 
 ```groovy
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
@@ -47,8 +46,6 @@ dependencies {
     <version>1.0.0</version>
 </dependency>
 ```
-
-> **Note:** Hiện tại library được publish lên Maven Local. Chạy `./gradlew publishToMavenLocal` trong project library trước khi sử dụng.
 
 ---
 
@@ -419,7 +416,7 @@ Nếu project **không sử dụng** Spring Security, các handler này sẽ kh�
 # Build và chạy test
 ./gradlew clean build
 
-# Publish lên Maven Local
+# Publish lên Maven Local (dùng cho phát triển)
 ./gradlew publishToMavenLocal
 ```
 
@@ -451,4 +448,4 @@ fptu.exe202.signify.apiresponse
 
 ## 📜 License
 
-MIT
+[Apache License 2.0](LICENSE)

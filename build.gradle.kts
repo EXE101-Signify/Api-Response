@@ -1,8 +1,6 @@
 plugins {
     `java-library`
-    `maven-publish`
     id("com.vanniktech.maven.publish") version "0.37.0"
-
 }
 
 group = "fptu.exe202.signify"
@@ -10,25 +8,30 @@ version = "1.0.0"
 description = "Consistent API responses and exception handling for Spring Boot MVC"
 
 java {
-    toolchain { languageVersion = JavaLanguageVersion.of(17) }
-    withSourcesJar()
-    withJavadocJar()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+
 }
 
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+}
 
-val springBootVersion = providers.gradleProperty("springBootVersion").getOrElse("3.5.11")
+val springBootVersion =
+    providers.gradleProperty("springBootVersion").getOrElse("3.5.11")
 
 dependencies {
-    // A regular platform supplies defaults without forcing versions on consumers.
     api(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
     api("org.springframework:spring-web")
     api("com.fasterxml.jackson.core:jackson-annotations")
+
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-webmvc")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("org.slf4j:slf4j-api")
+
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("org.springframework.security:spring-security-core")
 
@@ -46,30 +49,31 @@ tasks.withType<JavaCompile>().configureEach {
     options.release.set(17)
     options.compilerArgs.add("-parameters")
 }
-tasks.withType<Javadoc>().configureEach { options.encoding = "UTF-8" }
-tasks.test { useJUnitPlatform() }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            artifactId = "api-response"
-            pom {
-                name.set("api-response")
-                description.set(project.description)
-            }
-        }
-    }
+tasks.withType<Javadoc>().configureEach {
+    options.encoding = "UTF-8"
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 mavenPublishing {
-    coordinates("fptu.exe202.signify.apiresponse", "api-response", "1.0.0")
+    coordinates(
+        "io.github.gwuy.apiresponse",
+        "api-response",
+        "1.0.0"
+    )
+
 
     pom {
         name.set("Common Api Response")
-        description.set("Standardized API responses and validation error handling for Spring Boot.")
+        description.set(
+            "Standardized API responses and validation error handling for Spring Boot."
+        )
         inceptionYear.set("2026")
         url.set("https://github.com/EXE101-Signify/Api-Response")
+
         licenses {
             license {
                 name.set("The Apache License, Version 2.0")
@@ -77,6 +81,7 @@ mavenPublishing {
                 distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
+
         developers {
             developer {
                 id.set("GWuy")
@@ -84,10 +89,19 @@ mavenPublishing {
                 url.set("https://github.com/GWuy")
             }
         }
+
         scm {
             url.set("https://github.com/EXE101-Signify/Api-Response")
-            connection.set("scm:git:git://github.com/EXE101-Signify/Api-Response.git")
-            developerConnection.set("scm:git:ssh://git@github.com/EXE101-Signify/Api-Response.git")
+            connection.set(
+                "scm:git:git://github.com/EXE101-Signify/Api-Response.git"
+            )
+            developerConnection.set(
+                "scm:git:ssh://git@github.com/EXE101-Signify/Api-Response.git"
+            )
         }
     }
+}
+
+signing {
+    useGpgCmd()
 }

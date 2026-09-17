@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation("fptu.exe202.signify:api-response:1.0.0")
+    implementation("io.github.gwuy.apiresponse:api-response:1.0.0")
 }
 ```
 
@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'fptu.exe202.signify:api-response:1.0.0'
+    implementation 'io.github.gwuy.apiresponse:api-response:1.0.0'
 }
 ```
 

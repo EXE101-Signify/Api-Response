@@ -57,6 +57,7 @@ dependencies {
 | Tính năng | Mô tả |
 |-----------|--------|
 | `ApiResponse<T>` | Response wrapper thống nhất cho mọi API |
+| `PageResponse<T>` | Nội dung trang và metadata phân trang cho mọi kiểu DTO |
 | Custom Exceptions | `BadRequestException`, `ResourceNotFoundException`, `UnauthorizedException`, `ForbiddenException`, `ConflictException` |
 | Global Exception Handler | Tự động bắt và chuyển đổi exception thành `ApiResponse` |
 | Validation Error Handling | Hỗ trợ Jakarta Validation (`@NotBlank`, `@Email`, ...) |
@@ -191,6 +192,69 @@ ApiResponse.error(400, "Validation failed", errors);
 ```
 
 > Thông thường bạn **không cần gọi** `ApiResponse.error()` trực tiếp. Chỉ cần throw exception, `GlobalExceptionHandler` sẽ tạo error response tự động.
+
+---
+
+## 📄 Pagination
+
+`PageResponse<T>` nằm trong package `fptu.exe202.signify.apiresponse.response`. Model này nhận dữ liệu **đã được phân trang** từ ứng dụng và tính metadata; nó không truy vấn hoặc cắt danh sách dữ liệu. `T` có thể là bất kỳ DTO nào. `ApiResponse<T>` vẫn là wrapper bên ngoài như trước.
+
+```java
+PageResponse<UserResponse> result = PageResponse.of(users, page, size, totalElements);
+ApiResponse<PageResponse<UserResponse>> response =
+        ApiResponse.success("Users retrieved successfully", result);
+
+// Không có bản ghi nào khớp điều kiện truy vấn:
+PageResponse<UserResponse> emptyResult = PageResponse.empty(page, size);
+```
+
+| Field trong `data` | Kiểu | Ý nghĩa |
+|-------------------|------|---------|
+| `content` | `List<T>` | Dữ liệu của trang hiện tại; danh sách rỗng nếu trang không có dữ liệu |
+| `page` | `int` | Số trang hiện tại, **bắt đầu từ 0** |
+| `size` | `int` | Số phần tử tối đa trên mỗi trang, phải lớn hơn 0 |
+| `totalElements` | `long` | Tổng số phần tử thỏa điều kiện trên tất cả các trang |
+| `totalPages` | `long` | Số trang cần để chứa `totalElements` phần tử với `size` đã cho, làm tròn lên; bằng 0 nếu không có phần tử |
+| `first` | `boolean` | `true` nếu `page == 0` |
+| `last` | `boolean` | `true` nếu đây là trang cuối, trang vượt quá cuối, hoặc không có trang nào |
+| `empty` | `boolean` | `true` nếu `content` rỗng |
+
+`size` là sức chứa của **một** trang; `totalElements` là tổng số kết quả; `totalPages` được tính từ hai giá trị đó. Ví dụ 25 kết quả với `size = 10` có `totalPages = 3`. Factory giữ nguyên `page` và `size` được truyền vào, kể cả khi `page` vượt trang cuối. `page` phải không âm, `size` phải dương, `totalElements` phải không âm; factory từ chối giá trị không hợp lệ. Controller nên kiểm tra query parameters và trả lỗi HTTP phù hợp trước khi gọi service; model không xử lý HTTP validation.
+
+Ví dụ Controller (service và repository thuộc ứng dụng, không nằm trong thư viện):
+
+```java
+@GetMapping
+public ApiResponse<PageResponse<UserResponse>> getUsers(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+) {
+    // userService trả về dữ liệu đã phân trang cùng tổng số kết quả.
+    PageResponse<UserResponse> result = userService.getUsers(page, size);
+    return ApiResponse.success("Users retrieved successfully", result);
+}
+```
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "message": "Users retrieved successfully",
+  "data": {
+    "content": [{ "id": 1, "username": "john" }],
+    "page": 0,
+    "size": 10,
+    "totalElements": 25,
+    "totalPages": 3,
+    "first": true,
+    "last": false,
+    "empty": false
+  },
+  "timestamp": "2026-10-02T10:00:00+07:00"
+}
+```
+
+Thư viện không phụ thuộc Spring Data. Nếu ứng dụng sử dụng `org.springframework.data.domain.Page`, chuyển đổi ngay trong ứng dụng: `PageResponse.of(pageResult.getContent(), pageResult.getNumber(), pageResult.getSize(), pageResult.getTotalElements())`. Không cần thêm Spring Data vào project chỉ để dùng `ApiResponse` hoặc `PageResponse`.
 
 ---
 
@@ -430,7 +494,8 @@ Nếu project **không sử dụng** Spring Security, các handler này sẽ kh�
 ```
 fptu.exe202.signify.apiresponse
 ├── response
-│   └── ApiResponse          ← Generic response wrapper
+│   ├── ApiResponse          ← Generic response wrapper
+│   └── PageResponse         ← Generic pagination data và metadata
 ├── exception
 │   ├── BaseException        ← Abstract base (extend để tạo exception mới)
 │   ├── BadRequestException

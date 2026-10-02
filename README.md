@@ -42,7 +42,7 @@ dependencies {
 
 ```xml
 <dependency>
-    <groupId>fptu.exe202.signify</groupId>
+    <groupId>io.github.gwuy</groupId>
     <artifactId>api-response</artifactId>
     <version>1.0.0</version>
 </dependency>
